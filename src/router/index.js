@@ -11,6 +11,7 @@ import Cart from "@/views/layout/cart.vue";
 import Category from "@/views/layout/category.vue";
 import Home from "@/views/layout/home.vue";
 import User from "@/views/layout/user.vue";
+import store from "@/store";
 
 Vue.use(VueRouter)
 
@@ -22,33 +23,52 @@ const routes = [
         path: '/',
         component: Layout,
         redirect: '/home',
-        children:[
-            {path:'/cart',component: Cart},
-            {path: '/category',component: Category},
-            {path: '/home',component: Home},
-            {path: '/user',component: User},
+        children: [
+            {path: '/cart', component: Cart},
+            {path: '/category', component: Category},
+            {path: '/home', component: Home},
+            {path: '/user', component: User},
         ]
     },
     {
         path: '/search', component: Search
     },
     {
-        path: '/searchList',component: SearchList
+        path: '/searchList', component: SearchList
     },
     {
         //动态路由传参，路由参数中携带商品id
         path: '/proDetail/:id', component: ProDetail
     },
     {
-        path: 'pay',component: Pay
+        path: 'pay', component: Pay
     },
     {
-        path: 'myOrder',component: MyOrder
+        path: 'myOrder', component: MyOrder
     }
 ]
 
 const router = new VueRouter({
     routes
 })
+
+const authUrls = ['/pay', '/myOrder']
+
+router.beforeEach((to, from, next) => {
+    if (!authUrls.includes(to.path)) {
+        next()
+        return
+    }
+
+    const token = store.getters.token
+    console.log(token)
+
+    if (token) {
+        next()
+    } else {
+        next('/login')
+    }
+})
+
 
 export default router
