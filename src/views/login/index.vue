@@ -109,6 +109,7 @@ export default {
 
       codeLogin(this.mobile, this.msgCode).then((res) => {
         console.log(res.data)
+        this.$store.commit('user/setUserInfo',res.data)
         this.$toast('登录成功')
         this.$router.push('/')
       })
