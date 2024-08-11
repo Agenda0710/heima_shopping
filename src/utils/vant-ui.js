@@ -4,7 +4,9 @@ import {Tabbar, TabbarItem} from 'vant';
 import {NavBar} from 'vant';
 import {Toast} from 'vant';
 import {Search, Swipe, SwipeItem, Grid, GridItem} from 'vant'
+import {Icon} from 'vant'
 
+Vue.use(Icon)
 Vue.use(GridItem)
 Vue.use(Search)
 Vue.use(Swipe)
