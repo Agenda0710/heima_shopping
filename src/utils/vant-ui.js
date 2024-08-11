@@ -6,7 +6,12 @@ import {Toast} from 'vant';
 import {Search, Swipe, SwipeItem, Grid, GridItem} from 'vant'
 import {Icon} from 'vant'
 import { Rate } from 'vant';
+import { ActionSheet } from 'vant';
+import { Dialog } from 'vant';
 
+// 全局注册
+Vue.use(Dialog);
+Vue.use(ActionSheet);
 Vue.use(Rate);
 Vue.use(Icon)
 Vue.use(GridItem)

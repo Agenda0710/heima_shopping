@@ -75,9 +75,40 @@
         <van-icon name="shopping-cart-o"/>
         <span>购物车</span>
       </div>
-      <div class="btn-add">加入购物车</div>
-      <div class="btn-buy">立刻购买</div>
+      <div class="btn-add" @click="addFn">加入购物车</div>
+      <div class="btn-buy" @click="buyFn">立刻购买</div>
     </div>
+
+    <!--  弹窗  -->
+    <van-action-sheet v-model="show" :title="mode === 'cart' ? '添加购物车' : '立即购买' ">
+      <div class="product">
+        <div class="product-title">
+          <div class="left">
+            <img :src="goodDetail.goods_image" alt="">
+          </div>
+          <div class="right">
+            <div class="price">
+              <span>¥</span>
+              <span class="nowprice">{{ goodDetail.goods_price_min }}</span>
+            </div>
+            <div class="count">
+              <span>库存</span>
+              <span>{{ goodDetail.stock_total }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="num-box">
+          <span>数量</span>
+          <count-box v-model="addCount"></count-box>
+        </div>
+        <div class="showbtn" v-if=" goodDetail.stock_total>0 ">
+          <div class="btn" v-if="mode === 'cart'" @click="addCart()">加入购物车</div>
+          <div class="btn now" v-else>立刻购买</div>
+        </div>
+        <div class="btn-none" v-else>该商品已抢完</div>
+      </div>
+    </van-action-sheet>
+
   </div>
 </template>
 
@@ -85,9 +116,14 @@
 
 import {getComments, getProductDetail} from "@/api/product";
 import defaultImg from '@/assets/default-avatar.png'
+import countBox from "@/components/CountBox.vue";
+import {Toast} from "vant";
 
 export default {
   name: 'ProDetail',
+  components: {
+    countBox
+  },
   data() {
     return {
       images: [],
@@ -95,7 +131,10 @@ export default {
       goodDetail: {},
       comments: [],
       total: 0,
-      defaultImg
+      defaultImg,
+      mode: '',
+      show: false,
+      addCount: 1
     }
   },
   computed: {
@@ -112,6 +151,7 @@ export default {
         const res = response.data;
         this.goodDetail = res.detail;
         this.images = res.detail.goods_images;
+        console.log(this.goodDetail)
       })
     },
     getComments() {
@@ -119,8 +159,40 @@ export default {
         const res = response.data;
         this.comments = res.list
         this.total = res.total
-        console.log(this.comments)
       })
+    },
+    addFn() {
+      this.show = true
+      this.mode = "cart"
+    },
+    buyFn() {
+      this.show = true
+      this.mode = "buyNow"
+    },
+    addCart() {
+      //1、判断有无token
+      //2、有token无需进行任何操作，无token需要弹窗
+      if (this.$store.getters.token) {
+        Toast("加入购物车成功")
+      } else {
+        this.$dialog.confirm({
+          title: '加入购物车',
+          message: '您需要登录后才可以进行操作',
+          confirmButtonText:"去登录",
+          cancelButtonText:"再逛逛"
+        }).then(() => {
+          // on confirm
+          const backUrl = this.$route.fullPath
+          this.$router.replace({
+            path: '/login',
+            query:{
+              backUrl:backUrl
+            }
+          })
+        }).catch(() => {
+          // on cancel
+        });
+      }
     }
   },
   created() {
@@ -299,5 +371,61 @@ export default {
 
 .tips {
   padding: 10px;
+}
+
+
+.product {
+  .product-title {
+    display: flex;
+
+    .left {
+      img {
+        width: 90px;
+        height: 90px;
+      }
+
+      margin: 10px;
+    }
+
+    .right {
+      flex: 1;
+      padding: 10px;
+
+      .price {
+        font-size: 14px;
+        color: #fe560a;
+
+        .nowprice {
+          font-size: 24px;
+          margin: 0 5px;
+        }
+      }
+    }
+  }
+
+  .num-box {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+  }
+
+  .btn, .btn-none {
+    height: 40px;
+    line-height: 40px;
+    margin: 20px;
+    border-radius: 20px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 148, 2);
+  }
+
+  .btn.now {
+    background-color: #fe5630;
+  }
+
+  .btn-none {
+    background-color: #cccccc;
+  }
 }
 </style>
