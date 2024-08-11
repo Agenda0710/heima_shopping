@@ -10,3 +10,11 @@ export const getProductList = (obj) => {
         }
     })
 }
+
+export const getProductDetail = (goodsId) => {
+    return request.get('/goods/detail',{
+        params:{
+            goodsId
+        }
+    })
+}

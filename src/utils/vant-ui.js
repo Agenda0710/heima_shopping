@@ -5,7 +5,9 @@ import {NavBar} from 'vant';
 import {Toast} from 'vant';
 import {Search, Swipe, SwipeItem, Grid, GridItem} from 'vant'
 import {Icon} from 'vant'
+import { Rate } from 'vant';
 
+Vue.use(Rate);
 Vue.use(Icon)
 Vue.use(GridItem)
 Vue.use(Search)

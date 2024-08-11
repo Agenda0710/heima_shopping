@@ -52,7 +52,7 @@ export default {
     getProductList({
       goodsName: this.getGoodsName,
       page: this.page,
-      categoryId : this.$route.query.categoryId
+      categoryId: this.$route.query.categoryId
     }).then(response => {
       const res = response.data.list
       this.goodsList = res.data
