@@ -41,10 +41,10 @@ const routes = [
         path: '/proDetail/:id', component: ProDetail
     },
     {
-        path: 'pay', component: Pay
+        path: '/pay', component: Pay
     },
     {
-        path: 'myOrder', component: MyOrder
+        path: '/myOrder', component: MyOrder
     }
 ]
 
