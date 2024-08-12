@@ -83,21 +83,21 @@
 
       <!-- 买家留言 -->
       <div class="buytips">
-        <textarea placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10"></textarea>
+        <textarea v-model="remark" placeholder="选填：买家留言（50字内）" name="" id="" cols="30" rows="10"></textarea>
       </div>
     </div>
 
     <!-- 底部提交 -->
     <div class="footer-fixed">
       <div class="left">实付款：<span>￥{{ order.orderTotalPrice }}</span></div>
-      <div class="tipsbtn">提交订单</div>
+      <div class="tipsbtn" @click="submitOrder()">提交订单</div>
     </div>
   </div>
 </template>
 
 <script>
 import {getAddressList} from "@/api/address";
-import {checkOrder} from "@/api/order";
+import {checkOrder, submitOrder} from "@/api/order";
 
 export default {
   name: 'PayIndex',
@@ -105,7 +105,8 @@ export default {
     return {
       addressList: [],
       order: {},
-      personal: {}
+      personal: {},
+      remark: '', //留言
     }
   },
   computed: {
@@ -122,6 +123,15 @@ export default {
     },
     cartIds() {
       return this.$route.query.cartIds
+    },
+    goodsId() {
+      return this.$route.query.goodsId
+    },
+    goodsSkuId() {
+      return this.$route.query.goodsSkuId
+    },
+    goodsNum() {
+      return this.$route.query.goodsNum
     }
   },
   created() {
@@ -129,6 +139,24 @@ export default {
     this.getOrderList()
   },
   methods: {
+    submitOrder() {
+      if (this.mode === 'cart') {
+        submitOrder(this.mode, {
+          cartIds: this.cartIds,
+          remark: this.remark,
+        })
+      }
+      if (this.mode === 'buyNow'){
+        submitOrder(this.mode,{
+          remark: this.remark,
+          goodsId: this.goodsId,
+          goodsSkuId: this.goodsSkuId,
+          goodsNum: this.goodsNum
+        })
+      }
+      this.$toast.success('支付成功')
+      this.$router.replace('/myOrder')
+    },
     getAddressList() {
       getAddressList().then(response => {
         const res = response.data
@@ -138,6 +166,15 @@ export default {
     async getOrderList() {
       if (this.mode === 'cart') {
         const {data: {order, personal}} = await checkOrder(this.mode, {cartIds: this.cartIds})
+        this.order = order
+        this.personal = personal
+      }
+      if (this.mode === 'buyNow') {
+        const {data: {order, personal}} = await checkOrder(this.mode, {
+          goodsId: this.goodsId,
+          goodsSkuId: this.goodsSkuId,
+          goodsNum: this.goodsNum
+        })
         this.order = order
         this.personal = personal
       }

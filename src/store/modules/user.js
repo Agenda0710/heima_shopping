@@ -16,7 +16,14 @@ export default {
         }
     },
     //异步
-    actions: {},
+    actions: {
+        logOut(context) {
+            //个人信息重置
+            context.commit('setUserInfo', {})
+            //购物车历史信息重置
+            context.commit('cart/setCartList', [],{root: true})
+        }
+    },
     //计算属性
     getters: {}
 }

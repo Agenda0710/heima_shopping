@@ -120,12 +120,14 @@ import defaultImg from '@/assets/default-avatar.png'
 import countBox from "@/components/CountBox.vue";
 import {Toast} from "vant";
 import {addCart} from "@/api/cart";
+import loginConfirm from '@/mixins/loginConfirm'
 
 export default {
   name: 'ProDetail',
   components: {
     countBox
   },
+  mixins:[loginConfirm],
   data() {
     return {
       images: [],
@@ -137,7 +139,6 @@ export default {
       mode: '',
       show: false,
       addCount: 1,
-      cartTotal: localStorage.getItem("cartTotal")
     }
   },
   computed: {
@@ -171,36 +172,28 @@ export default {
     buyFn() {
       this.show = true
       this.mode = "buyNow"
+      if (this.loginConfirm()){
+        return
+      }
+      this.$router.push({
+        path:'/pay',
+        query:{
+          mode:this.mode,
+          goodsId:this.getGoodsId,
+          goodsSkuId:this.goodDetail.skuList[0].goods_sku_id,
+          goodsNum:this.addCount,
+        }
+      })
     },
     addCart() {
       //1、判断有无token
       //2、有token无需进行任何操作，无token需要弹窗
-      if (this.$store.getters.token) {
-        Toast("加入购物车成功")
-      } else {
-        this.$dialog.confirm({
-          title: '加入购物车',
-          message: '您需要登录后才可以进行操作',
-          confirmButtonText: "去登录",
-          cancelButtonText: "再逛逛"
-        }).then(() => {
-          // on confirm
-          const backUrl = this.$route.fullPath
-          this.$router.replace({
-            path: '/login',
-            query: {
-              backUrl: backUrl
-            }
-          })
-        }).catch(() => {
-          // on cancel
-        });
+      if (this.loginConfirm()){
+        return
       }
       addCart(this.getGoodsId, this.addCount, this.goodDetail.skuList[0].goods_sku_id).then((response) => {
         const res = response.data;
         this.cartTotal = res.cartTotal;
-        localStorage.setItem("cartTotal", this.cartTotal);
-        console.log(this.cartTotal)
         this.show = false
         Toast("加入购物车成功")
       })
