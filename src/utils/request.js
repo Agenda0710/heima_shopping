@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {Toast} from "vant";
+import store from "@/store";
 
 const request = axios.create({
     baseURL: 'http://smart-shop.itheima.net/index.php?s=/api',
@@ -15,6 +16,13 @@ request.interceptors.request.use(function (config) {
         forbidClick: true,
         duration: 0,
     });
+
+    // 每次请求都会携带token
+    const token = store.getters.token;
+    if (token){
+        config.headers['Access-token'] = token
+        config.headers.platform = 'h5'
+    }
     return config;
 }, function (error) {
     // 对请求错误做些什么

@@ -8,8 +8,12 @@ import {Icon} from 'vant'
 import { Rate } from 'vant';
 import { ActionSheet } from 'vant';
 import { Dialog } from 'vant';
+import { Checkbox, CheckboxGroup } from 'vant';
+
 
 // 全局注册
+Vue.use(Checkbox);
+Vue.use(CheckboxGroup);
 Vue.use(Dialog);
 Vue.use(ActionSheet);
 Vue.use(Rate);

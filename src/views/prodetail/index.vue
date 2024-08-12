@@ -67,11 +67,12 @@
 
     <!-- 底部 -->
     <div class="footer">
-      <div class="icon-home">
+      <div class="icon-home" @click="this.$router.push('/')">
         <van-icon name="wap-home-o"/>
         <span>首页</span>
       </div>
-      <div class="icon-cart">
+      <div class="icon-cart" @click="$router.push('/cart')">
+        <span v-if="cartTotal > 0" class="num">{{ cartTotal }}</span>
         <van-icon name="shopping-cart-o"/>
         <span>购物车</span>
       </div>
@@ -118,6 +119,7 @@ import {getComments, getProductDetail} from "@/api/product";
 import defaultImg from '@/assets/default-avatar.png'
 import countBox from "@/components/CountBox.vue";
 import {Toast} from "vant";
+import {addCart} from "@/api/cart";
 
 export default {
   name: 'ProDetail',
@@ -134,7 +136,8 @@ export default {
       defaultImg,
       mode: '',
       show: false,
-      addCount: 1
+      addCount: 1,
+      cartTotal: localStorage.getItem("cartTotal")
     }
   },
   computed: {
@@ -178,21 +181,29 @@ export default {
         this.$dialog.confirm({
           title: '加入购物车',
           message: '您需要登录后才可以进行操作',
-          confirmButtonText:"去登录",
-          cancelButtonText:"再逛逛"
+          confirmButtonText: "去登录",
+          cancelButtonText: "再逛逛"
         }).then(() => {
           // on confirm
           const backUrl = this.$route.fullPath
           this.$router.replace({
             path: '/login',
-            query:{
-              backUrl:backUrl
+            query: {
+              backUrl: backUrl
             }
           })
         }).catch(() => {
           // on cancel
         });
       }
+      addCart(this.getGoodsId, this.addCount, this.goodDetail.skuList[0].goods_sku_id).then((response) => {
+        const res = response.data;
+        this.cartTotal = res.cartTotal;
+        localStorage.setItem("cartTotal", this.cartTotal);
+        console.log(this.cartTotal)
+        this.show = false
+        Toast("加入购物车成功")
+      })
     }
   },
   created() {
@@ -426,6 +437,24 @@ export default {
 
   .btn-none {
     background-color: #cccccc;
+  }
+}
+
+.footer .icon-cart {
+  position: relative;
+  padding: 0 6px;
+
+  .num {
+    z-index: 999;
+    position: absolute;
+    top: -2px;
+    right: 0;
+    min-width: 16px;
+    padding: 0 4px;
+    color: #fff;
+    text-align: center;
+    background-color: #ee0a24;
+    border-radius: 50%;
   }
 }
 </style>
